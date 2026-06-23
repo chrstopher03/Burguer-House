@@ -9,7 +9,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff9800">
 <style>
 
 *{
@@ -591,6 +592,14 @@ estado.innerHTML = "🔴 Cerrado · Abrimos a las 10:00 AM";
 
 actualizarHorario();
 setInterval(actualizarHorario,60000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("SW registrado"))
+      .catch(err => console.log("Error SW:", err));
+  });
+}
 </script>
 
 </body>
