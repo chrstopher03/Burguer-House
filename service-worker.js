@@ -1,4 +1,4 @@
-const CACHE_NAME = "burger-house-v2"; // 👈 cambia versión aquí cuando actualices
+const CACHE_NAME = "burger-house-v3"; // 👈 cambia versión aquí cuando actualices
 
 const urlsToCache = [
   "/",

@@ -429,6 +429,43 @@ cursor:pointer;
 .video-showcase video:hover{
 transform:scale(1.03);
 }
+
+.install-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+
+  background: linear-gradient(135deg, #ff9800, #ff6b00);
+  color: white;
+
+  border: none;
+  padding: 14px 18px;
+  border-radius: 50px;
+
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+
+  box-shadow: 0 10px 25px rgba(255, 152, 0, 0.35);
+
+  cursor: pointer;
+
+  display: none;
+
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+/* hover */
+.install-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 30px rgba(255, 152, 0, 0.5);
+}
+
+/* click */
+.install-btn:active {
+  transform: scale(0.95);
+}
 </style>
 </head>
 
@@ -464,8 +501,8 @@ Ordenar ahora
 
 <img src="1.jpeg">
 </section>
-<button id="installBtn" onclick="installApp()" style="display:none;">
-  Instalar App
+<button id="installBtn" onclick="installApp()" class="install-btn">
+  📲 Instalar App
 </button>
 <section class="about">
 <h2>Acerca de <span class="orange">Burguer House</span></h2>
