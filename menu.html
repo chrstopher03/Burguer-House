@@ -373,6 +373,15 @@ color:#ff9800;
 
   <div class="cards" id="bandejas"></div>
 </section>
+
+<!-- ================= MENÚ DE BEBIDAS ================= -->
+<section class="menu">
+  <div class="title">
+    <h1>Menú de <span>Bebidas</span></h1>
+  </div>
+
+  <div class="cards" id="bebidas"></div>
+</section>
 <nav class="bottom-nav">
 
 <button class="nav-item" onclick="location.href='index.html'">
@@ -491,31 +500,18 @@ extras:[]
 
 /* ================= BANDEJAS ================= */
 const bandejas = [
-{
-nombre:"Bandeja Expres",
-precio:550,
-desc:"Incluye Bebidas",
-img:"17.jpeg"
-},
-{
-nombre:"Bandeja House",
-precio:780,
-desc:"Incluye Coca-Cola 1LT",
-img:"18.jpeg"
-},
-{
-nombre:"bandeja Mundialista",
-precio:570,
-desc:"Incluye bebidas",
-img:"27.jpeg"
-},
+{nombre:"Bandeja Expres",precio:550,desc:"Incluye Bebidas",img:"17.jpeg"},
+{nombre:"Bandeja House",precio:780,desc:"Incluye Coca-Cola 1LT",img:"18.jpeg"},
+{nombre:"Bandeja Mundialista",precio:570,desc:"Incluye bebidas",img:"27.jpeg"},
+{nombre:"Bandeja Fest",precio:680,desc:"Incluye 3 bebidas",img:"20.jpeg"}
+];
 
-{
-nombre:"Bandeja Fest",
-precio:680,
-desc:"Incluye 3 bebidas",
-img:"20.jpeg"
-}
+/* ================= BEBIDAS ================= */
+const bebidas = [
+{nombre:"",precio:60,desc:"",img:"28.jpeg"},
+{nombre:"Coca-Cola de lata",precio:60,desc:"Coca-Cola",img:"29.jpeg"},
+{nombre:"Coca-Cola 2LT",precio:60,desc:"Refrescante",img:"30.jpeg"},
+{nombre:"Agua Cielo",precio:30,desc:"Sabor fresa Kiwi",img:"31.jpeg"}
 ];
 
 /* ================= CARRITO ================= */
@@ -527,11 +523,9 @@ let extrasSeleccionados = {};
 
 /* ================= RENDER MENÚ ================= */
 function render(){
-
 let html = "";
 
 productos.forEach((p,i)=>{
-
 let extrasPreview = "";
 
 if(p.extras?.length){
@@ -563,13 +557,11 @@ ${window.innerWidth<=768?"+":"Agregar"}
 document.getElementById("menu").innerHTML = html;
 }
 
-/* ================= RENDER BANDEJAS ================= */
+/* ================= BANDEJAS ================= */
 function renderBandejas(){
-
 let html = "";
 
 bandejas.forEach((p,i)=>{
-
 html += `
 <div class="card">
 
@@ -591,69 +583,34 @@ ${window.innerWidth<=768?"+":"Agregar"}
 document.getElementById("bandejas").innerHTML = html;
 }
 
-/* ================= EXTRAS ================= */
-function abrirExtras(i){
+/* ================= BEBIDAS ================= */
+function renderBebidas(){
+let html = "";
 
-productoSeleccionado = productos[i];
-extrasSeleccionados = {};
+bebidas.forEach((p,i)=>{
+html += `
+<div class="card">
 
-let extrasHTML = "";
+<img src="${p.img}" onclick="abrirLightbox('${p.img}')">
 
-if(productoSeleccionado.extras?.length){
+<div class="card-body">
+<h3>${p.nombre}</h3>
+<p>${p.desc}</p>
+<div class="price">C$${p.precio}</div>
+</div>
 
-productoSeleccionado.extras.forEach((e,idx)=>{
-
-extrasHTML += `
-<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;border-bottom:1px solid #222;padding:6px 0;">
-
-<label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-<input type="checkbox" onchange="toggleExtra(${idx})">
-<span>${e.nombre}</span>
-</label>
-
-<span style="color:#ff9800;font-weight:bold">+C$${e.precio}</span>
+<button class="add-btn" onclick="agregarBebida(${i})">
+${window.innerWidth<=768?"+":"Agregar"}
+</button>
 
 </div>`;
 });
 
-}else{
-extrasHTML = `<p style="color:#aaa">Sin extras</p>`;
+document.getElementById("bebidas").innerHTML = html;
 }
 
-let box = document.createElement("div");
-box.id="extrasBox";
-box.style = `
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.9);
-display:flex;align-items:center;justify-content:center;
-z-index:9999;`;
-
-box.innerHTML = `
-<div style="background:#111;padding:20px;border-radius:15px;width:320px;color:#fff">
-
-<h3>${productoSeleccionado.nombre}</h3>
-
-<div style="margin:10px 0;">
-${extrasHTML}
-</div>
-
-<button onclick="confirmarExtra()" style="width:100%;padding:12px;background:#ff9800;border:none;font-weight:800;border-radius:10px;">
-Agregar
-</button>
-
-<button onclick="cerrarExtras()" style="width:100%;margin-top:10px;padding:10px;background:#333;border:none;color:#fff;border-radius:10px;">
-Cerrar
-</button>
-
-</div>`;
-
-document.body.appendChild(box);
-}
-
-/* ================= BANDEJAS ================= */
-function agregarBandeja(i){
-
-let p = bandejas[i];
+function agregarBebida(i){
+let p = bebidas[i];
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
@@ -675,7 +632,52 @@ extras:[]
 localStorage.setItem("carrito",JSON.stringify(carrito));
 
 update();
-mostrarToast("✔ Bandeja agregada");
+mostrarToast("✔ Bebida agregada");
+}
+
+/* ================= EXTRAS ================= */
+function abrirExtras(i){
+productoSeleccionado = productos[i];
+extrasSeleccionados = {};
+
+let extrasHTML = "";
+
+if(productoSeleccionado.extras?.length){
+productoSeleccionado.extras.forEach((e,idx)=>{
+extrasHTML += `
+<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;border-bottom:1px solid #222;padding:6px 0;">
+
+<label style="display:flex;align-items:center;gap:8px;">
+<input type="checkbox" onchange="toggleExtra(${idx})">
+<span>${e.nombre}</span>
+</label>
+
+<span style="color:#ff9800;font-weight:bold">+C$${e.precio}</span>
+
+</div>`;
+});
+}else{
+extrasHTML = `<p style="color:#aaa">Sin extras</p>`;
+}
+
+let box = document.createElement("div");
+box.id="extrasBox";
+box.style = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;`;
+
+box.innerHTML = `
+<div style="background:#111;padding:20px;border-radius:15px;width:320px;color:#fff">
+
+<h3>${productoSeleccionado.nombre}</h3>
+
+${extrasHTML}
+
+<button onclick="confirmarExtra()" style="width:100%;padding:12px;background:#ff9800;border:none;font-weight:800;border-radius:10px;">Agregar</button>
+
+<button onclick="cerrarExtras()" style="width:100%;margin-top:10px;padding:10px;background:#333;border:none;color:#fff;border-radius:10px;">Cerrar</button>
+
+</div>`;
+
+document.body.appendChild(box);
 }
 
 /* ================= CARRITO ================= */
@@ -709,7 +711,11 @@ update();
 mostrarToast("✔ Agregado");
 }
 
-/* ================= UTILIDADES ================= */
+function cerrarExtras(){
+let b=document.getElementById("extrasBox");
+if(b) b.remove();
+}
+
 function toggleExtra(i){
 let e = productoSeleccionado.extras[i];
 
@@ -720,18 +726,38 @@ extrasSeleccionados[e.nombre]=e.precio;
 }
 }
 
-function cerrarExtras(){
-let b=document.getElementById("extrasBox");
-if(b) b.remove();
+/* ================= BANDEJAS ================= */
+function agregarBandeja(i){
+let p = bandejas[i];
+
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+let index = carrito.findIndex(x=>x.nombre===p.nombre);
+
+if(index!==-1){
+carrito[index].qty++;
+}else{
+carrito.push({
+nombre:p.nombre,
+precio:p.precio,
+desc:p.desc,
+img:p.img,
+qty:1,
+extras:[]
+});
+}
+
+localStorage.setItem("carrito",JSON.stringify(carrito));
+
+update();
+mostrarToast("✔ Bandeja agregada");
 }
 
 /* ================= UPDATE ================= */
 function update(){
-
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
 let total=0;
-
 carrito.forEach(p=>total+=p.qty);
 
 document.getElementById("count").innerText=total;
@@ -754,6 +780,7 @@ function abrirLightbox(img){
 document.getElementById("lightboxImg").src=img;
 document.getElementById("lightbox").style.display="flex";
 }
+
 function cerrarLightbox(){
 document.getElementById("lightbox").style.display="none";
 document.getElementById("lightboxImg").src="";
@@ -762,6 +789,7 @@ document.getElementById("lightboxImg").src="";
 /* ================= INIT ================= */
 render();
 renderBandejas();
+renderBebidas();
 update();
 </script>
 </body>
