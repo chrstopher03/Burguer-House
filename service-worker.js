@@ -1,4 +1,4 @@
-const CACHE_NAME = "burger-house-v2";
+const CACHE_NAME = "burger-house-v3"; // 👈 cambia versión siempre al actualizar
 
 const urlsToCache = [
   "/",
@@ -24,12 +24,11 @@ self.addEventListener("install", (event) => {
     })
   );
 
-  // fuerza instalación inmediata
   self.skipWaiting();
 });
 
 // =========================
-// ACTIVATE (BORRA CACHES VIEJOS)
+// ACTIVATE
 // =========================
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -48,29 +47,31 @@ self.addEventListener("activate", (event) => {
 });
 
 // =========================
-// RECIBE MENSAJES (IMPORTANTE)
+// SKIP WAITING MESSAGE
 // =========================
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
+  if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
 // =========================
-// FETCH (CACHE FIRST)
+// FETCH (CACHE + UPDATE FIX)
 // =========================
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-
-      return fetch(event.request)
-        .then((networkResponse) => networkResponse)
-        .catch(() => {
-          if (event.request.destination === "document") {
-            return caches.match("/index.html");
-          }
+    fetch(event.request)
+      .then((networkResponse) => {
+        // actualizar cache en segundo plano
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
         });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          return cached || caches.match("/index.html");
+        });
+      })
   );
 });

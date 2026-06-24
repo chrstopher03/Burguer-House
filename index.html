@@ -705,7 +705,7 @@ setInterval(actualizarHorario,60000);
 let deferredPrompt;
 
 // =========================
-//  SERVICE WORKER
+// SERVICE WORKER
 // =========================
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -713,11 +713,11 @@ if ("serviceWorker" in navigator) {
       .then((reg) => {
         console.log("SW registrado");
 
-        // =========================
-        // DETECTAR ACTUALIZACIONES
-        // =========================
+        // Detectar actualizaciones
         reg.addEventListener("updatefound", () => {
           const newWorker = reg.installing;
+
+          if (!newWorker) return;
 
           newWorker.addEventListener("statechange", () => {
             if (
@@ -725,8 +725,6 @@ if ("serviceWorker" in navigator) {
               navigator.serviceWorker.controller
             ) {
               console.log("Nueva versión disponible");
-
-              // 👇 aquí puedes mostrar un botón de actualizar si quieres
               showUpdateButton(reg);
             }
           });
@@ -737,7 +735,14 @@ if ("serviceWorker" in navigator) {
 }
 
 // =========================
-//  BOTÓN INSTALAR APP
+// RELOAD AUTOMÁTICO CUANDO CAMBIA SW
+// =========================
+navigator.serviceWorker?.addEventListener("controllerchange", () => {
+  window.location.reload();
+});
+
+// =========================
+// BOTÓN INSTALAR APP
 // =========================
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
@@ -748,7 +753,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 // =========================
-//  FUNCIÓN INSTALAR
+// INSTALAR APP
 // =========================
 function installApp() {
   if (!deferredPrompt) return;
@@ -762,6 +767,10 @@ function installApp() {
     deferredPrompt = null;
   });
 }
+
+// =========================
+// BOTÓN ACTUALIZAR APP
+// =========================
 function showUpdateButton(reg) {
   let updateBtn = document.getElementById("updateBtn");
 
@@ -770,50 +779,37 @@ function showUpdateButton(reg) {
     updateBtn.id = "updateBtn";
     updateBtn.innerText = "Actualizar App";
 
-    updateBtn.style.position = "fixed";
-    updateBtn.style.bottom = "100px";
-    updateBtn.style.right = "20px";
-    updateBtn.style.zIndex = "9999";
-    updateBtn.style.padding = "12px 16px";
-    updateBtn.style.background = "#ff6b00";
-    updateBtn.style.color = "#fff";
-    updateBtn.style.border = "none";
-    updateBtn.style.borderRadius = "10px";
-    updateBtn.style.cursor = "pointer";
+    Object.assign(updateBtn.style, {
+      position: "fixed",
+      bottom: "100px",
+      right: "20px",
+      zIndex: "9999",
+      padding: "12px 16px",
+      background: "#ff6b00",
+      color: "#fff",
+      border: "none",
+      borderRadius: "10px",
+      cursor: "pointer"
+    });
 
     document.body.appendChild(updateBtn);
   }
 
   updateBtn.style.display = "block";
 
-  updateBtn.onclick = () => {
-    const sw = reg.waiting;
+  updateBtn.onclick = async () => {
+    const waitingSW = reg.waiting;
 
-    if (!sw) {
-      console.log("No hay SW en waiting");
+    // Si no hay SW esperando, recarga normal
+    if (!waitingSW) {
+      console.log("No hay SW en waiting → recargando");
       window.location.reload();
       return;
     }
 
-    sw.postMessage({ type: "SKIP_WAITING" });
-
-    // fallback por si no dispara controllerchange
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    // enviar mensaje al SW
+    waitingSW.postMessage({ type: "SKIP_WAITING" });
   };
-}
-// =========================
-//  BOTÓN INSTALAR (CLICK)
-// =========================
-function installApp() {
-  if (!deferredPrompt) return;
-
-  deferredPrompt.prompt();
-
-  deferredPrompt.userChoice.then(() => {
-    deferredPrompt = null;
-  });
 }
 </script>
 
