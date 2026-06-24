@@ -702,6 +702,7 @@ estado.innerHTML = "🔴 Cerrado · Abrimos a las 10:00 AM";
 
 actualizarHorario();
 setInterval(actualizarHorario,60000);
+let deferredPrompt;
 
 // =========================
 //  SERVICE WORKER
@@ -761,10 +762,6 @@ function installApp() {
     deferredPrompt = null;
   });
 }
-
-// =========================
-//  BOTÓN ACTUALIZAR APP
-// =========================
 function showUpdateButton(reg) {
   let updateBtn = document.getElementById("updateBtn");
 
@@ -772,6 +769,7 @@ function showUpdateButton(reg) {
     updateBtn = document.createElement("button");
     updateBtn.id = "updateBtn";
     updateBtn.innerText = "Actualizar App";
+
     updateBtn.style.position = "fixed";
     updateBtn.style.bottom = "100px";
     updateBtn.style.right = "20px";
@@ -789,11 +787,22 @@ function showUpdateButton(reg) {
   updateBtn.style.display = "block";
 
   updateBtn.onclick = () => {
-    reg.waiting.postMessage({ type: "SKIP_WAITING" });
-    window.location.reload();
+    const sw = reg.waiting;
+
+    if (!sw) {
+      console.log("No hay SW en waiting");
+      window.location.reload();
+      return;
+    }
+
+    sw.postMessage({ type: "SKIP_WAITING" });
+
+    // fallback por si no dispara controllerchange
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 }
-
 // =========================
 //  BOTÓN INSTALAR (CLICK)
 // =========================
