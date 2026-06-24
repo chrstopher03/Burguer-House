@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Burger House</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= RESET ================= */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#050505;
+color:#fff;
+}
+
+/* ================= CONTAINER ================= */
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px;
+}
+
+/* ================= GRID ================= */
+.grid{
+display:grid;
+gap:16px;
+}
+
+.grid-3{
+grid-template-columns:repeat(3,1fr);
+}
+
+/* ================= CARD ================= */
+.card{
+background:linear-gradient(180deg,#141414,#0d0d0d);
+border:1px solid #222;
+border-radius:22px;
+padding:18px;
+margin-bottom:16px;
+}
+
+/* ================= INPUT ================= */
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:14px;
+border:1px solid #2a2a2a;
+background:#111;
+color:#fff;
+}
+
+/* ================= BUTTON ================= */
+.btn{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:14px;
+background:#ff9800;
+font-weight:800;
+cursor:pointer;
+}
+
+.btn:hover{opacity:.9}
+
+.btn-danger{
+background:#ff3b3b;
+}
+
+/* ================= PRODUCT ================= */
+.product{
+display:flex;
+justify-content:space-between;
+padding:10px;
+margin-top:8px;
+background:#111;
+border-radius:12px;
+cursor:pointer;
+}
+
+.product:hover{
+border:1px solid #ff9800;
+}
+
+/* ================= HISTORY ================= */
+.history-item{
+background:#111;
+padding:12px;
+border-radius:14px;
+margin-top:10px;
+}
+
+.small{
+font-size:12px;
+color:#aaa;
+}
+
+/* ================= TITLES ================= */
+h1{
+font-size:30px;
+color:#ff9800;
+}
+
+h2{
+margin-bottom:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🍔 Burger House POS</h1>
+
+<!-- DASHBOARD -->
+<div class="grid grid-3">
+
+<div class="card">
+<p>Ventas Hoy</p>
+<h2 id="todaySales">C$0</h2>
+</div>
+
+<div class="card">
+<p>Total Ventas</p>
+<h2 id="totalSales">C$0</h2>
+</div>
+
+<div class="card">
+<p>Facturas</p>
+<h2 id="countSales">0</h2>
+</div>
+
+</div>
+
+<!-- FACTURADOR -->
+<div class="card">
+
+<h2>🧾 Nueva Venta</h2>
+
+<input id="client" placeholder="Cliente">
+
+<div id="products"></div>
+
+<h3>Total: <span id="total">C$0</span></h3>
+
+<button class="btn" onclick="saveSale()">Registrar Venta</button>
+<button class="btn btn-danger" onclick="clearCart()">Cancelar</button>
+
+</div>
+
+<!-- HISTORIAL -->
+<div class="card">
+
+<h2>📊 Historial</h2>
+<div id="history"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ================= PRODUCTS ================= */
+let products = [
+{name:"Doble House", price:250},
+{name:"Club Sandwich", price:150},
+{name:"Salchipapa", price:140},
+{name:"Burrito XL", price:160}
+];
+
+let cart = [];
+let sales = JSON.parse(localStorage.getItem("sales")) || [];
+
+/* ================= RENDER PRODUCTS ================= */
+function renderProducts(){
+document.getElementById("products").innerHTML =
+products.map((p,i)=>`
+<div class="product" onclick="add(${i})">
+<span>${p.name}</span>
+<span>C$${p.price}</span>
+</div>
+`).join("");
+}
+
+/* ================= ADD ================= */
+function add(i){
+cart.push({...products[i], qty:1});
+render();
+}
+
+/* ================= TOTAL ================= */
+function total(){
+return cart.reduce((a,b)=>a+b.price,0);
+}
+
+/* ================= SAVE SALE ================= */
+function saveSale(){
+
+if(cart.length===0) return;
+
+let client = document.getElementById("client").value || "Cliente";
+
+sales.push({
+client,
+items:cart,
+total:total(),
+date:new Date().toLocaleDateString()
+});
+
+localStorage.setItem("sales",JSON.stringify(sales));
+
+cart=[];
+render();
+update();
+
+}
+
+/* ================= CLEAR ================= */
+function clearCart(){
+cart=[];
+render();
+}
+
+/* ================= DELETE ================= */
+function deleteSale(i){
+sales.splice(i,1);
+localStorage.setItem("sales",JSON.stringify(sales));
+render();
+update();
+}
+
+/* ================= RENDER ================= */
+function render(){
+
+renderProducts();
+
+document.getElementById("total").innerText = "C$"+total();
+
+/* HISTORY */
+document.getElementById("history").innerHTML =
+sales.slice(-8).reverse().map((s,i)=>`
+<div class="history-item">
+<b>${s.client}</b>
+
+<div class="small">
+${s.items.map(p=>`• ${p.name} - C$${p.price}`).join("<br>")}
+</div>
+
+<b>Total: C$${s.total}</b>
+
+<button class="btn btn-danger" onclick="deleteSale(${sales.indexOf(s)})">
+Eliminar
+</button>
+
+</div>
+`).join("");
+
+update();
+}
+
+/* ================= STATS ================= */
+function update(){
+
+let today = new Date().toLocaleDateString();
+
+let todaySales = sales
+.filter(s=>s.date===today)
+.reduce((a,b)=>a+b.total,0);
+
+document.getElementById("todaySales").innerText =
+"C$"+todaySales;
+
+document.getElementById("totalSales").innerText =
+"C$"+sales.reduce((a,b)=>a+b.total,0);
+
+document.getElementById("countSales").innerText =
+sales.length;
+}
+
+render();
+update();
+
+</script>
+
+</body>
+</html>

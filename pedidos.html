@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pedidos Pro</title>
+<title>Pedidos</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -371,7 +371,7 @@ color:#ff9800;
 <body>
 
 <header>
-<div class="logo">🍔 Burger House</div>
+<div class="logo">🍔 Burguer House</div>
 
 
 </header>
@@ -400,7 +400,7 @@ color:#ff9800;
 </div>
 
 <div class="option" onclick="setDelivery(30,this)">
- Domicilio <span>C$30</span>
+ Domicilio <span>C$40</span>
 </div>
 </div>
 
@@ -460,6 +460,7 @@ Confirmar Pedido 📲
 <script>let cart = JSON.parse(localStorage.getItem("carrito")) || [];
 let delivery = 0;
 let pay = "Efectivo";
+let direccion = "";
 
 /* ================= ALERTAS PRO ================= */
 function alerta(msg, tipo="info"){
@@ -489,7 +490,7 @@ toast.style.transition="0.3s ease";
 
 document.body.appendChild(toast);
 
-setTimeout(()=> toast.style.transform="translateX(0)",50);
+setTimeout(()=>toast.style.transform="translateX(0)",50);
 
 setTimeout(()=>{
 toast.style.transform="translateX(120%)";
@@ -502,6 +503,7 @@ setTimeout(()=>toast.remove(),300);
 function confirmarAccion(mensaje, callback){
 
 let overlay=document.createElement("div");
+
 overlay.style.position="fixed";
 overlay.style.top="0";
 overlay.style.left="0";
@@ -538,6 +540,84 @@ overlay.remove();
 
 }
 
+/* ================= MODAL DIRECCIÓN ================= */
+function pedirDireccion(callback){
+
+let overlay=document.createElement("div");
+
+overlay.style.position="fixed";
+overlay.style.top="0";
+overlay.style.left="0";
+overlay.style.right="0";
+overlay.style.bottom="0";
+overlay.style.background="rgba(0,0,0,.75)";
+overlay.style.display="flex";
+overlay.style.justifyContent="center";
+overlay.style.alignItems="center";
+overlay.style.zIndex="100000";
+
+overlay.innerHTML=`
+<div style="
+background:#111;
+width:90%;
+max-width:420px;
+padding:25px;
+border-radius:20px;
+border:1px solid #333;
+box-shadow:0 15px 40px rgba(0,0,0,.5);
+">
+
+<h3 style="color:#ff9800;text-align:center;margin-bottom:10px;">
+ Dirección de Entrega
+</h3>
+
+<p style="color:#aaa;text-align:center;font-size:13px;margin-bottom:15px;">
+Ingresa la dirección donde recibirás tu pedido
+</p>
+
+<textarea id="direccionInput"
+placeholder="Ej: Del parque 2 cuadras al norte..."
+style="width:100%;height:100px;padding:12px;border:none;border-radius:12px;background:#1b1b1b;color:white;resize:none;"></textarea>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+
+<button id="cancelDir"
+style="flex:1;padding:12px;border:none;border-radius:12px;background:#444;color:white;font-weight:bold;cursor:pointer;">
+Cancelar
+</button>
+
+<button id="saveDir"
+style="flex:1;padding:12px;border:none;border-radius:12px;background:#ff9800;color:black;font-weight:bold;cursor:pointer;">
+Guardar
+</button>
+
+</div>
+
+</div>
+`;
+
+document.body.appendChild(overlay);
+
+document.getElementById("saveDir").onclick=()=>{
+
+let dir=document.getElementById("direccionInput").value.trim();
+
+if(!dir){
+alerta("Ingresa una dirección","error");
+return;
+}
+
+callback(dir);
+overlay.remove();
+
+};
+
+document.getElementById("cancelDir").onclick=()=>{
+overlay.remove();
+};
+
+}
+
 /* ================= RENDER ================= */
 function render(){
 
@@ -545,56 +625,47 @@ let html="";
 
 cart.forEach((p,i)=>{
 
-if(!p.qty) p.qty = 1;
-if(!p.extras) p.extras = [];
+if(!p.qty) p.qty=1;
+if(!p.extras) p.extras=[];
 
-let extrasHTML = "";
+let extrasHTML="";
 
 if(p.extras.length){
-extrasHTML = `
+extrasHTML=`
 <div style="font-size:12px;color:#aaa;margin-top:3px;">
-Extras: ${p.extras.map(e => e.nombre).join(", ")}
-</div>
-`;
+Extras: ${p.extras.map(e=>e.nombre).join(", ")}
+</div>`;
 }
 
-html += `
+html+=`
 <div class="item">
-
 <img src="${p.img}">
-
 <div class="info">
 <div class="name">${p.nombre}</div>
-
 ${extrasHTML}
-
 <div class="price">C$${p.precio.toLocaleString()}</div>
 </div>
 
 <div class="controls">
-
 <div class="qty">
 <button onclick="change(${i},-1)">-</button>
 <span>${p.qty}</span>
 <button onclick="change(${i},1)">+</button>
 </div>
-
 <button class="del" onclick="removeItem(${i})">🗑</button>
-
 </div>
-
-</div>
-`;
+</div>`;
 });
 
-document.getElementById("list").innerHTML = html;
+document.getElementById("list").innerHTML=html;
 calc();
 }
 
 /* ================= CAMBIAR ================= */
 function change(i,v){
-cart[i].qty += v;
-if(cart[i].qty < 1) cart[i].qty = 1;
+
+cart[i].qty+=v;
+if(cart[i].qty<1) cart[i].qty=1;
 
 save();
 render();
@@ -603,6 +674,7 @@ alerta("Cantidad actualizada ✔","info");
 
 /* ================= ELIMINAR ================= */
 function removeItem(i){
+
 cart.splice(i,1);
 save();
 render();
@@ -612,12 +684,12 @@ alerta("Producto eliminado 🗑","error");
 /* ================= VACIAR ================= */
 function clearCart(){
 
-if(cart.length === 0){
+if(cart.length===0){
 alerta("El carrito ya está vacío","error");
 return;
 }
 
-confirmarAccion("¿Vaciar carrito completo?", ()=>{
+confirmarAccion("¿Vaciar carrito completo?",()=>{
 cart=[];
 save();
 render();
@@ -628,6 +700,7 @@ alerta("Carrito vaciado ✔","success");
 
 /* ================= DELIVERY ================= */
 function setDelivery(v,el){
+
 delivery=v;
 
 document.querySelectorAll(".option")
@@ -635,12 +708,23 @@ document.querySelectorAll(".option")
 
 el.classList.add("active");
 
+if(v>0){
+pedirDireccion((dir)=>{
+direccion=dir;
+alerta("Dirección Agregada Correctamente","success");
 calc();
+});
+}else{
+direccion="";
+calc();
+}
+
 alerta("Entrega actualizada ✔","info");
 }
 
 /* ================= PAGO ================= */
 function setPay(el){
+
 pay=el.innerText;
 
 document.querySelectorAll(".pay")
@@ -657,77 +741,85 @@ function calc(){
 let subtotal=0;
 
 cart.forEach(p=>{
-subtotal += p.precio * p.qty;
+subtotal+=p.precio*p.qty;
 });
 
-document.getElementById("subtotal").innerText =
-"C$" + subtotal.toLocaleString();
-
-document.getElementById("delivery").innerText =
-delivery===0 ? "Gratis" : "C$" + delivery.toLocaleString();
-
-document.getElementById("total").innerText =
-"C$" + (subtotal + delivery).toLocaleString();
+document.getElementById("subtotal").innerText="C$"+subtotal.toLocaleString();
+document.getElementById("delivery").innerText=delivery===0?"Gratis":"C$"+delivery.toLocaleString();
+document.getElementById("total").innerText="C$"+(subtotal+delivery).toLocaleString();
 
 }
 
 /* ================= GUARDAR ================= */
 function save(){
-localStorage.setItem("carrito", JSON.stringify(cart));
+localStorage.setItem("carrito",JSON.stringify(cart));
 }
 
-/* ================= WHATSAPP PRO (CON EXTRAS) ================= */
-function sendWhatsApp() {
+/* ================= WHATSAPP ================= */
+function sendWhatsApp(){
 
-if (cart.length === 0) {
-alerta("El carrito está vacío", "error");
+if(cart.length===0){
+alerta("El carrito está vacío","error");
 return;
 }
 
-const now = new Date();
+if(delivery>0 && !direccion){
 
-const fecha = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
-const hora = now.toLocaleTimeString('es-NI', {
-hour: '2-digit',
-minute: '2-digit',
-hour12: true
+pedirDireccion((dir)=>{
+direccion=dir;
+sendWhatsApp();
 });
 
-let mensaje = `🍔 *BURGER HOUSE*%0A`;
-mensaje += `--------------------------------%0A`;
-mensaje += `📅 Fecha: ${fecha}%0A`;
-mensaje += `⏰ Hora : ${hora}%0A`;
-mensaje += `--------------------------------%0A`;
-mensaje += `🛒 PRODUCTOS%0A`;
-mensaje += `--------------------------------%0A`;
-
-let subtotal = 0;
-
-cart.forEach(item => {
-
-let extrasText = "";
-
-if(item.extras && item.extras.length){
-extrasText = " (" + item.extras.map(e => e.nombre).join(", ") + ")";
+return;
 }
 
-let totalItem = item.precio * item.qty;
+const now=new Date();
 
-mensaje += `• ${item.nombre}${extrasText} x${item.qty} = C$${totalItem}%0A`;
+const fecha=`${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
 
-subtotal += totalItem;
+const hora=now.toLocaleTimeString('es-NI',{
+hour:'2-digit',
+minute:'2-digit',
+hour12:true
 });
 
-let total = subtotal + delivery;
+let mensaje=`🍔 *BURGUER HOUSE*%0A`;
+mensaje+=`--------------------------------%0A`;
+mensaje+=`📅 Fecha: ${fecha}%0A`;
+mensaje+=`⏰ Hora : ${hora}%0A`;
+mensaje+=`--------------------------------%0A`;
+mensaje+=`🛒 PRODUCTOS%0A`;
 
-mensaje += `--------------------------------%0A`;
-mensaje += `💰 Subtotal: C$${subtotal}%0A`;
-mensaje += `🚚 Entrega : C$${delivery}%0A`;
-mensaje += `--------------------------------%0A`;
-mensaje += `🔥 TOTAL   : C$${total}%0A`;
-mensaje += `💳 Pago    : ${pay}%0A`;
-mensaje += `--------------------------------%0A%0A`;
-mensaje += `📩 Confirmo mi pedido. Gracias.`;
+let subtotal=0;
+
+cart.forEach(item=>{
+
+let extrasText=item.extras?.length
+?` (${item.extras.map(e=>e.nombre).join(", ")})`
+:"";
+
+let totalItem=item.precio*item.qty;
+
+mensaje+=`• ${item.nombre}${extrasText} x${item.qty} = C$${totalItem}%0A`;
+
+subtotal+=totalItem;
+});
+
+let total=subtotal+delivery;
+
+mensaje+=`--------------------------------%0A`;
+mensaje+=`💰 Subtotal: C$${subtotal}%0A`;
+mensaje+=`🚚 Entrega : C$${delivery}%0A`;
+
+if(delivery>0){
+mensaje+=` Dirección: ${direccion}%0A`;
+}
+
+mensaje+=`--------------------------------%0A`;
+mensaje+=`🔥 TOTAL : C$${total}%0A`;
+mensaje+=`💳 Pago : ${pay}%0A`;
+mensaje+=`--------------------------------%0A%0A`;
+mensaje+=`📩 Confirmo mi pedido. Gracias.`;
 
 window.open(
 `https://wa.me/50586982394?text=${mensaje}`,

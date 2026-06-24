@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Menú - Burger House</title>
+<title>Menú - Burguer House</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -343,7 +343,7 @@ color:#ff9800;
 <body>
 
 <header>
-<div class="logo">🍔 Burger House</div>
+<div class="logo">🍔 Burguer House</div>
 </header>
 
 <div class="cart">
@@ -365,7 +365,14 @@ color:#ff9800;
 <div id="lightbox" class="lightbox" onclick="cerrarLightbox()">
   <img id="lightboxImg" src="">
 </div>
+<!-- ================= MENÚ DE BANDEJAS ================= -->
+<section class="menu">
+  <div class="title">
+    <h1>Menú de <span>Bandejas</span></h1>
+  </div>
 
+  <div class="cards" id="bandejas"></div>
+</section>
 <nav class="bottom-nav">
 
 <button class="nav-item" onclick="location.href='index.html'">
@@ -391,8 +398,7 @@ color:#ff9800;
 <span>Promos</span>
 </button>
 
-</nav><script>
-const productos=[
+</nav><script>const productos = [
 {
 nombre:"Doble House",
 precio:250,
@@ -406,7 +412,7 @@ extras:[
 {
 nombre:"Club Sandwich",
 precio:150,
-desc:"Cuatro capas de pan de molde ! Frescos vegetales + queso amarillo y fina mortadela + carne molida de res o pollo + quesillo de exportación + papas y bebida",
+desc:"Cuatro capas de pan de molde ! Frescos vegetales + queso amarillo + carne + quesillo + papas y bebida",
 img:"4.jpeg",
 extras:[
 {nombre:"Papas",precio:2},
@@ -438,47 +444,91 @@ nombre:"El Híbrido",
 precio:180,
 desc:"Cheese Burger + papas + salsas + bebida",
 img:"7.jpeg",
+extras:[]
 },
 {
 nombre:"Burrito XL",
 precio:160,
-desc:"Orden de burritos tamaño xl ! Carne molida de Res o pollo con quesillo de exportación! Salsa, Fina mortadela y frescos vegetales !",
+desc:"Burrito XL con carne y quesillo",
 img:"9.jpeg",
 extras:[
 {nombre:"Papas",precio:2},
 {nombre:"Gaseosa",precio:1.5}
 ]
 },
-
 {
 nombre:"Carnívora (G)",
 precio:200,
-desc:"Gigante + salchichas + quesillo de exportación + salsas + carne molida de res + bebida",
+desc:"Gigante + salchichas + carne + bebida",
 img:"10.jpeg",
 extras:[
 {nombre:"Papas",precio:2},
 {nombre:"Gaseosa",precio:1.5}
 ]
 },
-
 {
 nombre:"Love and thunder",
 precio:200,
-desc:"Chesse Burguer + burrito xl + mini papas y Coca-Cola 1lt",
+desc:"Combo especial + bebida",
 img:"11.jpeg",
+extras:[]
 },
 {
 nombre:"Dedos de pollo",
 precio:160,
-desc:"Orden de dedos de pollo + papas + bebida y salsas a elección",
+desc:"Pollo crispy + papas + bebida",
 img:"12.jpeg",
+extras:[]
 },
-
 {
 nombre:"Salchipapa (G)",
 precio:150,
-desc:"Clásica gigante + quesillo de exportación + salchichas + salsas y bebida",
+desc:"Grande + salchichas + bebida",
 img:"13.jpeg",
+extras:[]
+},
+{
+nombre:"Salchipapa (M)",
+precio:140,
+desc:"Mediana + salchichas",
+img:"15.jpeg",
+extras:[]
+},
+{
+nombre:"Salchipollo Crispy",
+precio:200,
+desc:"Pollo crispy + salsas",
+img:"16.jpeg",
+extras:[]
+}
+];
+
+/* ================= BANDEJAS ================= */
+const bandejas = [
+{
+nombre:"Bandeja House",
+precio:780,
+desc:"Incluye Bebidas",
+img:"17.jpeg"
+},
+{
+nombre:"Bandeja Express",
+precio:350,
+desc:"Incluye Coca-Cola 1LT",
+img:"18.jpeg"
+},
+{
+nombre:"Bandeja Gringa",
+precio:700,
+desc:"Coca-Cola 2LT",
+img:"19.jpeg"
+},
+
+{
+nombre:"Bandeja Fest",
+precio:680,
+desc:"Incluye 3 bebidas",
+img:"20.jpeg"
 }
 ];
 
@@ -489,46 +539,70 @@ let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let productoSeleccionado = null;
 let extrasSeleccionados = {};
 
-/* ================= RENDER ================= */
+/* ================= RENDER MENÚ ================= */
 function render(){
-let html="";
+
+let html = "";
 
 productos.forEach((p,i)=>{
 
-// 👇 EXTRAS visibles debajo del nombre
 let extrasPreview = "";
+
 if(p.extras?.length){
 extrasPreview = `
 <div style="font-size:12px;color:#aaa;margin-top:4px;">
-Extras: ${p.extras.map(e => e.nombre).join(", ")}
-</div>
-`;
+Extras: ${p.extras.map(e=>e.nombre).join(", ")}
+</div>`;
 }
 
-html+=`
+html += `
 <div class="card">
 
 <img src="${p.img}" onclick="abrirLightbox('${p.img}')">
 
 <div class="card-body">
 <h3>${p.nombre}</h3>
-
 ${extrasPreview}
-
 <p>${p.desc}</p>
 <div class="price">C$${p.precio}</div>
 </div>
 
 <button class="add-btn" onclick="abrirExtras(${i})">
-${window.innerWidth <= 768 ? "+" : "Agregar"}
+${window.innerWidth<=768?"+":"Agregar"}
 </button>
 
-</div>
-`;
+</div>`;
 });
 
 document.getElementById("menu").innerHTML = html;
-update();
+}
+
+/* ================= RENDER BANDEJAS ================= */
+function renderBandejas(){
+
+let html = "";
+
+bandejas.forEach((p,i)=>{
+
+html += `
+<div class="card">
+
+<img src="${p.img}" onclick="abrirLightbox('${p.img}')">
+
+<div class="card-body">
+<h3>${p.nombre}</h3>
+<p>${p.desc}</p>
+<div class="price">C$${p.precio}</div>
+</div>
+
+<button class="add-btn" onclick="agregarBandeja(${i})">
+${window.innerWidth<=768?"+":"Agregar"}
+</button>
+
+</div>`;
+});
+
+document.getElementById("bandejas").innerHTML = html;
 }
 
 /* ================= EXTRAS ================= */
@@ -543,9 +617,9 @@ if(productoSeleccionado.extras?.length){
 
 productoSeleccionado.extras.forEach((e,idx)=>{
 
-extrasHTML+=`
-<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;padding:6px 0;border-bottom:1px solid #222;">
-  
+extrasHTML += `
+<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;border-bottom:1px solid #222;padding:6px 0;">
+
 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
 <input type="checkbox" onchange="toggleExtra(${idx})">
 <span>${e.nombre}</span>
@@ -553,155 +627,116 @@ extrasHTML+=`
 
 <span style="color:#ff9800;font-weight:bold">+C$${e.precio}</span>
 
-</div>
-`;
+</div>`;
 });
 
 }else{
-extrasHTML = `<p style="color:#aaa">Este producto no tiene extras</p>`;
+extrasHTML = `<p style="color:#aaa">Sin extras</p>`;
 }
 
 let box = document.createElement("div");
 box.id="extrasBox";
-box.style.position="fixed";
-box.style.top="0";
-box.style.left="0";
-box.style.width="100%";
-box.style.height="100%";
-box.style.background="rgba(0,0,0,.9)";
-box.style.display="flex";
-box.style.alignItems="center";
-box.style.justifyContent="center";
-box.style.zIndex="9999";
+box.style = `
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.9);
+display:flex;align-items:center;justify-content:center;
+z-index:9999;`;
 
-box.innerHTML=`
+box.innerHTML = `
 <div style="background:#111;padding:20px;border-radius:15px;width:320px;color:#fff">
 
 <h3>${productoSeleccionado.nombre}</h3>
 
-<div style="margin:10px 0 15px 0;">
+<div style="margin:10px 0;">
 ${extrasHTML}
 </div>
 
-<button onclick="confirmarExtra()" style="
-width:100%;
-padding:12px;
-background:#ff9800;
-border:none;
-font-weight:800;
-border-radius:10px;
-cursor:pointer;">
-Agregar Extras
+<button onclick="confirmarExtra()" style="width:100%;padding:12px;background:#ff9800;border:none;font-weight:800;border-radius:10px;">
+Agregar
 </button>
 
-<button onclick="cerrarExtras()" style="
-width:100%;
-margin-top:10px;
-padding:10px;
-background:#333;
-border:none;
-color:#fff;
-border-radius:10px;
-cursor:pointer;">
+<button onclick="cerrarExtras()" style="width:100%;margin-top:10px;padding:10px;background:#333;border:none;color:#fff;border-radius:10px;">
 Cerrar
 </button>
 
-</div>
-`;
+</div>`;
 
 document.body.appendChild(box);
 }
 
-/* ================= TOGGLE ================= */
-function toggleExtra(i){
-let extra = productoSeleccionado.extras[i];
+/* ================= BANDEJAS ================= */
+function agregarBandeja(i){
 
-if(extrasSeleccionados[extra.nombre]){
-delete extrasSeleccionados[extra.nombre];
-}else{
-extrasSeleccionados[extra.nombre] = extra.precio;
-}
-}
+let p = bandejas[i];
 
-/* ================= CONFIRMAR ================= */
-function confirmarExtra(){
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-let base = productoSeleccionado.precio;
-let extraTotal = 0;
-let extrasFinal = [];
+let index = carrito.findIndex(x=>x.nombre===p.nombre);
 
-for(let key in extrasSeleccionados){
-extraTotal += extrasSeleccionados[key];
-
-extrasFinal.push({
-nombre: key,
-precio: extrasSeleccionados[key]
-});
-}
-
-let total = base + extraTotal;
-
-/* carrito actualizado */
-carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-/* evitar duplicados exactos */
-let index = carrito.findIndex(item =>
-item.nombre === productoSeleccionado.nombre &&
-JSON.stringify(item.extras || []) === JSON.stringify(extrasFinal)
-);
-
-if(index !== -1){
-carrito[index].qty += 1;
+if(index!==-1){
+carrito[index].qty++;
 }else{
 carrito.push({
-nombre: productoSeleccionado.nombre,
-precio: total,
-desc: productoSeleccionado.desc,
-img: productoSeleccionado.img,
-qty: 1,
-extras: extrasFinal
-});
-}
-
-localStorage.setItem("carrito", JSON.stringify(carrito));
-
-cerrarExtras();
-update();
-mostrarToast("✔ Agregado con extras");
-}
-
-/* ================= CERRAR ================= */
-function cerrarExtras(){
-let box = document.getElementById("extrasBox");
-if(box) box.remove();
-}
-
-/* ================= AGREGAR NORMAL ================= */
-function agregar(i){
-
-let producto = productos[i];
-
-carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-let index = carrito.findIndex(p => p.nombre === producto.nombre);
-
-if(index !== -1){
-carrito[index].qty += 1;
-}else{
-carrito.push({
-nombre: producto.nombre,
-precio: producto.precio,
-desc: producto.desc,
-img: producto.img,
-qty: 1,
+nombre:p.nombre,
+precio:p.precio,
+desc:p.desc,
+img:p.img,
+qty:1,
 extras:[]
 });
 }
 
-localStorage.setItem("carrito", JSON.stringify(carrito));
+localStorage.setItem("carrito",JSON.stringify(carrito));
 
 update();
-mostrarToast("✔ Agregado a pedidos");
+mostrarToast("✔ Bandeja agregada");
+}
+
+/* ================= CARRITO ================= */
+function confirmarExtra(){
+
+let extraTotal = 0;
+let extrasFinal = [];
+
+for(let k in extrasSeleccionados){
+extraTotal += extrasSeleccionados[k];
+extrasFinal.push({nombre:k,precio:extrasSeleccionados[k]});
+}
+
+let total = productoSeleccionado.precio + extraTotal;
+
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+carrito.push({
+nombre:productoSeleccionado.nombre,
+precio:total,
+desc:productoSeleccionado.desc,
+img:productoSeleccionado.img,
+qty:1,
+extras:extrasFinal
+});
+
+localStorage.setItem("carrito",JSON.stringify(carrito));
+
+cerrarExtras();
+update();
+mostrarToast("✔ Agregado");
+}
+
+/* ================= UTILIDADES ================= */
+function toggleExtra(i){
+let e = productoSeleccionado.extras[i];
+
+if(extrasSeleccionados[e.nombre]){
+delete extrasSeleccionados[e.nombre];
+}else{
+extrasSeleccionados[e.nombre]=e.precio;
+}
+}
+
+function cerrarExtras(){
+let b=document.getElementById("extrasBox");
+if(b) b.remove();
 }
 
 /* ================= UPDATE ================= */
@@ -709,53 +744,38 @@ function update(){
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-let total = 0;
+let total=0;
 
-carrito.forEach(p=>{
-total += p.qty;
-});
+carrito.forEach(p=>total+=p.qty);
 
-document.getElementById("count").innerText = total;
+document.getElementById("count").innerText=total;
 
-let nav = document.getElementById("cartCount");
-if(nav){
-nav.innerText = total;
-}
+let nav=document.getElementById("cartCount");
+if(nav) nav.innerText=total;
 }
 
 /* ================= TOAST ================= */
 function mostrarToast(msg){
-let toast=document.createElement("div");
-toast.innerText=msg;
-
-toast.style.position="fixed";
-toast.style.bottom="20px";
-toast.style.right="20px";
-toast.style.background="#ff9800";
-toast.style.color="#000";
-toast.style.padding="10px 14px";
-toast.style.borderRadius="10px";
-toast.style.fontWeight="bold";
-toast.style.zIndex="9999";
-
-document.body.appendChild(toast);
-
-setTimeout(()=>toast.remove(),1500);
+let t=document.createElement("div");
+t.innerText=msg;
+t.style=`position:fixed;bottom:20px;right:20px;background:#ff9800;color:#000;padding:10px 14px;border-radius:10px;font-weight:bold;z-index:9999;`;
+document.body.appendChild(t);
+setTimeout(()=>t.remove(),1500);
 }
 
 /* ================= LIGHTBOX ================= */
 function abrirLightbox(img){
-document.getElementById("lightboxImg").src = img;
-document.getElementById("lightbox").style.display = "flex";
+document.getElementById("lightboxImg").src=img;
+document.getElementById("lightbox").style.display="flex";
 }
-
 function cerrarLightbox(){
-document.getElementById("lightbox").style.display = "none";
-document.getElementById("lightboxImg").src = "";
+document.getElementById("lightbox").style.display="none";
+document.getElementById("lightboxImg").src="";
 }
 
 /* ================= INIT ================= */
 render();
+renderBandejas();
 update();
 </script>
 </body>
