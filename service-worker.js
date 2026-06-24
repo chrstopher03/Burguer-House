@@ -1,4 +1,4 @@
-const CACHE_NAME = "burger-house-v2"; // 👈 cambia versión aquí cuando actualices
+const CACHE_NAME = "burger-house-v2"; // 👈 sube versión cuando actualices
 
 const urlsToCache = [
   "/",
@@ -24,12 +24,12 @@ self.addEventListener("install", (event) => {
     })
   );
 
-  // fuerza instalación inmediata
+  // activa rápido la nueva versión
   self.skipWaiting();
 });
 
 // =========================
-// ACTIVATE (BORRA VIEJOS CACHES)
+// ACTIVATE (LIMPIA CACHES VIEJOS)
 // =========================
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -48,21 +48,27 @@ self.addEventListener("activate", (event) => {
 });
 
 // =========================
-// FETCH (CACHE FIRST + NETWORK FALLBACK)
+// 🔥 ESTE ES EL FIX QUE TE FALTABA
+// =========================
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+// =========================
+// FETCH (CACHE FIRST + FALLBACK)
 // =========================
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+      if (cachedResponse) return cachedResponse;
 
       return fetch(event.request)
         .then((networkResponse) => {
           return networkResponse;
         })
         .catch(() => {
-          // opcional: podrías devolver una página offline aquí
           if (event.request.destination === "document") {
             return caches.match("/index.html");
           }
