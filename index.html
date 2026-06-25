@@ -697,31 +697,65 @@ updateCount();
 
 render();
 updateCount();
-
 function actualizarHorario(){
 
-const ahora = new Date();
-const hora = ahora.getHours();
+  const ahora = new Date();
+  const hora = ahora.getHours();
+  const minutos = ahora.getMinutes();
 
-const estado = document.getElementById("estadoLocal");
+  const estado = document.getElementById("estadoLocal");
+  const btnComprar = document.getElementById("btnComprar");
 
-/* Abierto de 10 AM a 9 PM */
-if(hora >= 10 && hora < 21){
+  const ahoraMin = hora * 60 + minutos;
 
-estado.className = "estado-local abierto";
-estado.innerHTML = "🟢 Abierto ahora · 10:00 AM - 9:00 PM";
+  const apertura = 10 * 60;      // 10:00 AM
+  const cierre = 21 * 60;        // 9:00 PM
 
-}else{
+  const recesoInicio = 15 * 60;      // 3:00 PM
+  const recesoFin = 18 * 60 + 30;    // 6:30 PM
 
-estado.className = "estado-local cerrado";
-estado.innerHTML = "🔴 Cerrado · Abrimos a las 10:00 AM";
+  const enReceso = ahoraMin >= recesoInicio && ahoraMin < recesoFin;
+  const abierto = hora >= 10 && hora < 21;
 
-}
+  // 🔴 RECESO
+  if (enReceso) {
 
+    estado.className = "estado-local receso";
+    estado.innerHTML = "🟡 En receso · 3:00 PM - 6:30 PM";
+
+    if (btnComprar) {
+      btnComprar.disabled = true;
+      btnComprar.innerText = "En receso - no disponible";
+    }
+
+  }
+  // 🟢 ABIERTO NORMAL
+  else if (abierto) {
+
+    estado.className = "estado-local abierto";
+    estado.innerHTML = "🟢 Abierto ahora · 10:00 AM - 9:00 PM";
+
+    if (btnComprar) {
+      btnComprar.disabled = false;
+      btnComprar.innerText = "Comprar ahora";
+    }
+
+  }
+  // 🔴 CERRADO
+  else {
+
+    estado.className = "estado-local cerrado";
+    estado.innerHTML = "🔴 Cerrado · Abrimos a las 10:00 AM";
+
+    if (btnComprar) {
+      btnComprar.disabled = true;
+      btnComprar.innerText = "Cerrado";
+    }
+  }
 }
 
 actualizarHorario();
-setInterval(actualizarHorario,60000);
+setInterval(actualizarHorario, 60000);
 let deferredPrompt;
 
 // =========================
