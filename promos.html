@@ -340,14 +340,14 @@ color:#ff9800;
 
 /* PROMOS */
 const promos = [
-{nombre:"El Híbrido",precio:180,img:"8.jpeg",desc:"-30%"},
-{nombre:"Tio Primo",precio:380,img:"21.jpeg",desc:"-25%"},
-{nombre:"Love and Thunder",precio:270,img:"22.jpeg",desc:"-35%"},
-{nombre:"Combo House",precio:300,img:"24.jpeg",desc:"-28%"},
-{nombre:"Combo Familiar",precio:500,img:"25.jpeg",desc:"-28%"},
-{nombre:"Combo Shark",precio:250,img:"37.jpeg",desc:"-28%"},
-{nombre:"Combo X4",precio:480,img:"38.jpeg",desc:"-28%"},
-{nombre:"Combo Dude Perfect",precio:200,img:"40.jpeg",desc:"-28%"}
+{nombre:"El Híbrido",precio:180,img:"8.jpeg"},
+{nombre:"Tio Primo",precio:380,img:"21.jpeg"},
+{nombre:"Love and Thunder",precio:270,img:"22.jpeg"},
+{nombre:"Combo House",precio:300,img:"24.jpeg"},
+{nombre:"Combo Familiar",precio:500,img:"25.jpeg"},
+{nombre:"Combo Shark",precio:250,img:"37.jpeg"},
+{nombre:"Combo X4",precio:480,img:"38.jpeg"},
+{nombre:"Combo Dude Perfect",precio:200,img:"40.jpeg"}
 ];
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
@@ -357,11 +357,10 @@ let html="";
 promos.forEach((p,i)=>{
 html+=`
 <div class="card">
-<div class="discount">${p.desc}</div>
 <img src="${p.img}" onclick="verImagen('${p.img}')">
 <div class="card-body">
 <h3>${p.nombre}</h3>
-<div class="price">C$${p.precio} </span></div>
+<div class="price">C$${p.precio}</div>
 <button onclick="agregar(${i})">Agregar</button>
 </div>
 </div>`;
