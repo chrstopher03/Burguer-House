@@ -419,7 +419,7 @@ color:#ff9800;
 {
 nombre:"Doble House",
 precio:250,
-desc:"Doble de carne, cheddar, bacon y extra de quesillo más barbacoa ! Acompañado de papas y bebida",
+desc:"Doble de carne, cheddar, bacon y extra de quesillo más barbacoa - Bacon y salsa barbacoa como protagonistas ! Acompañado de papas y bebida",
 img:"3.jpeg",
 extras:[
 {nombre:"Papas",precio:40},
@@ -438,7 +438,7 @@ extras:[
 },
 {
 nombre:"Doble king",
-precio:150,
+precio:200,
 desc:"Doble todo!",
 img:"5.jpeg",
 extras:[
@@ -449,21 +449,41 @@ extras:[
 {
 nombre:"Monster House",
 precio:300,
-desc:"Triple mounstrocidad ! Acompañado de papas y bebida",
+desc:"Triple mounstrocidad - Bacon y salsa barbacoa como protagonistas ! Acompañado de papas y bebida",
 img:"6.jpeg",
 extras:[
 {nombre:"Papas",precio:2},
 {nombre:"Gaseosa",precio:1.5}
 ]
 },
+
+
+{
+nombre:"Chesse Clasica",
+precio:100,
+desc:"",
+img:"36.jpeg",
+extras:[
+{nombre:"Papas",precio:35},
+{nombre:"Gaseosa",precio:25}
+]
+},
+
+
+{
+nombre:"Club Burguer",
+precio:180,
+desc:"Club Burguer + papas y bebida",
+img:"39.jpeg",
+extras:[ ]
+},
+
 {
 nombre:"Burrito XL",
 precio:160,
 desc:"Burrito XL con carne y quesillo",
 img:"9.jpeg",
 extras:[
-{nombre:"Papas",precio:2},
-{nombre:"Gaseosa",precio:1.5}
 ]
 },
 {
@@ -485,22 +505,22 @@ extras:[]
 },
 {
 nombre:"Salchipapa (G)",
-precio:150,
+precio:180,
 desc:"Grande + salchichas + bebida",
 img:"13.jpeg",
 extras:[]
 },
 {
 nombre:"Salchipapa (M)",
-precio:140,
-desc:"Mediana + salchichas",
+precio:160,
+desc:"Mediana + salchichas + bebida",
 img:"15.jpeg",
 extras:[]
 },
 {
 nombre:"Salchipollo Crispy",
 precio:200,
-desc:"Pollo crispy + salsas",
+desc:"Pollo crispy + salsas + bebida",
 img:"16.jpeg",
 extras:[]
 }
@@ -542,7 +562,7 @@ let extrasPreview = "";
 if(p.extras?.length){
 extrasPreview = `
 <div style="font-size:12px;color:#aaa;margin-top:4px;">
-Extras: ${p.extras.map(e=>e.nombre).join(", ")}
+Agregar Extras: ${p.extras.map(e=>e.nombre).join(", ")}
 </div>`;
 }
 
