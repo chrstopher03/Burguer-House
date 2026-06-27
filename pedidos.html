@@ -407,7 +407,7 @@ color:#ff9800;
  Retiro <span>Gratis</span>
 </div>
 
-<div class="option" onclick="setDelivery(30,this)">
+<div class="option" onclick="setDelivery(40,this)">
  Domicilio <span>C$40</span>
 </div>
 </div>
@@ -728,6 +728,67 @@ calc();
 }
 
 alerta("Entrega actualizada ✔","info");
+}/* ================= ALERTA TRANSFERENCIA ================= */
+function mostrarCuentaBampro(){
+
+let overlay=document.createElement("div");
+
+overlay.style.position="fixed";
+overlay.style.top="0";
+overlay.style.left="0";
+overlay.style.right="0";
+overlay.style.bottom="0";
+overlay.style.background="rgba(0,0,0,.75)";
+overlay.style.display="flex";
+overlay.style.justifyContent="center";
+overlay.style.alignItems="center";
+overlay.style.zIndex="100000";
+
+overlay.innerHTML=`
+<div style="
+background:#111;
+width:90%;
+max-width:380px;
+padding:25px;
+border-radius:20px;
+border:1px solid #333;
+text-align:center;
+box-shadow:0 15px 40px rgba(0,0,0,.5);
+">
+
+<h2 style="color:#ff9800;">🏦 Transferencia Bancaria</h2>
+
+<p style="color:#fff;font-size:16px;font-weight:bold;">
+La transferencia se realizará a una cuenta BAMPRO.
+</p>
+
+<p style="color:#aaa;font-size:13px;margin-top:15px;">
+Al confirmar el pedido te enviaremos los datos de la cuenta por WhatsApp.
+</p>
+
+<button id="cerrarCuenta"
+style="
+margin-top:20px;
+padding:12px 25px;
+background:#ff9800;
+color:#000;
+font-weight:bold;
+border:none;
+border-radius:12px;
+cursor:pointer;
+">
+Entendido
+</button>
+
+</div>
+`;
+
+document.body.appendChild(overlay);
+
+document.getElementById("cerrarCuenta").onclick=()=>{
+overlay.remove();
+};
+
 }
 
 /* ================= PAGO ================= */
@@ -740,7 +801,12 @@ document.querySelectorAll(".pay")
 
 el.classList.add("active");
 
+if(pay.toLowerCase().includes("transfer")){
+mostrarCuentaBampro();
+}
+
 alerta("Método de pago seleccionado ✔","info");
+
 }
 
 /* ================= CALCULAR ================= */
@@ -820,7 +886,7 @@ mensaje+=`💰 Subtotal: C$${subtotal}%0A`;
 mensaje+=`🚚 Entrega : C$${delivery}%0A`;
 
 if(delivery>0){
-mensaje+=` Dirección: ${direccion}%0A`;
+mensaje+=`📍 Dirección: ${direccion}%0A`;
 }
 
 mensaje+=`--------------------------------%0A`;
@@ -838,7 +904,6 @@ window.open(
 
 /* ================= INIT ================= */
 render();
-
 </script>
 </body>
 </html>
