@@ -546,23 +546,28 @@ document.getElementById("noBtn").onclick=()=>{
 overlay.remove();
 };
 
-}
-
-/* ================= MODAL DIRECCIÓN ================= */
+}/* ================= MODAL DIRECCIÓN ================= */
 function pedirDireccion(callback){
 
 let overlay=document.createElement("div");
 
 overlay.style.position="fixed";
-overlay.style.top="0";
-overlay.style.left="0";
-overlay.style.right="0";
-overlay.style.bottom="0";
+overlay.style.inset="0";
 overlay.style.background="rgba(0,0,0,.75)";
 overlay.style.display="flex";
 overlay.style.justifyContent="center";
 overlay.style.alignItems="center";
 overlay.style.zIndex="100000";
+
+document.body.appendChild(overlay);
+
+let direccionTemp="";
+let telefonoTemp="";
+
+mostrarDireccion();
+
+/* ================= PASO 1 ================= */
+function mostrarDireccion(){
 
 overlay.innerHTML=`
 <div style="
@@ -576,22 +581,91 @@ box-shadow:0 15px 40px rgba(0,0,0,.5);
 ">
 
 <h3 style="color:#ff9800;text-align:center;margin-bottom:10px;">
- Dirección de Entrega
+📍 Dirección de Entrega
 </h3>
 
 <p style="color:#aaa;text-align:center;font-size:13px;margin-bottom:15px;">
 Ingresa la dirección donde recibirás tu pedido
 </p>
 
-<textarea id="direccionInput"
+<textarea
+id="direccionInput"
 placeholder="Ej: Del parque 2 cuadras al norte..."
-style="width:100%;height:100px;padding:12px;border:none;border-radius:12px;background:#1b1b1b;color:white;resize:none;"></textarea>
+style="width:100%;height:100px;padding:12px;border:none;border-radius:12px;background:#1b1b1b;color:white;resize:none;"
+>${direccionTemp}</textarea>
 
 <div style="display:flex;gap:10px;margin-top:15px;">
 
 <button id="cancelDir"
 style="flex:1;padding:12px;border:none;border-radius:12px;background:#444;color:white;font-weight:bold;cursor:pointer;">
 Cancelar
+</button>
+
+<button id="nextDir"
+style="flex:1;padding:12px;border:none;border-radius:12px;background:#ff9800;color:black;font-weight:bold;cursor:pointer;">
+Siguiente
+</button>
+
+</div>
+
+</div>
+`;
+
+document.getElementById("cancelDir").onclick=()=>{
+overlay.remove();
+};
+
+document.getElementById("nextDir").onclick=()=>{
+
+direccionTemp=document.getElementById("direccionInput").value.trim();
+
+if(!direccionTemp){
+alerta("Ingresa una dirección","error");
+return;
+}
+
+mostrarTelefono();
+
+};
+
+}
+
+/* ================= PASO 2 ================= */
+function mostrarTelefono(){
+
+overlay.innerHTML=`
+<div style="
+background:#111;
+width:90%;
+max-width:420px;
+padding:25px;
+border-radius:20px;
+border:1px solid #333;
+box-shadow:0 15px 40px rgba(0,0,0,.5);
+">
+
+<h3 style="color:#ff9800;text-align:center;margin-bottom:10px;">
+📞 Número de Teléfono
+</h3>
+
+<p style="color:#aaa;text-align:center;font-size:13px;margin-bottom:15px;">
+Ingresa tu número de teléfono
+</p>
+
+<input
+id="telefonoInput"
+type="tel"
+maxlength="8"
+value="${telefonoTemp}"
+placeholder="88888888"
+style="width:100%;padding:12px;border:none;border-radius:12px;background:#1b1b1b;color:white;font-size:16px;"
+>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+
+<button id="backDir"
+style="flex:1;padding:12px;border:none;border-radius:12px;background:#444;color:white;font-weight:bold;cursor:pointer;">
+Atrás
 </button>
 
 <button id="saveDir"
@@ -604,28 +678,38 @@ Guardar
 </div>
 `;
 
-document.body.appendChild(overlay);
+const input=document.getElementById("telefonoInput");
+
+input.oninput=()=>{
+input.value=input.value.replace(/\D/g,"").slice(0,8);
+};
+
+document.getElementById("backDir").onclick=()=>{
+telefonoTemp=input.value;
+mostrarDireccion();
+};
 
 document.getElementById("saveDir").onclick=()=>{
 
-let dir=document.getElementById("direccionInput").value.trim();
+telefonoTemp=input.value.trim();
 
-if(!dir){
-alerta("Ingresa una dirección","error");
+if(telefonoTemp.length!==8){
+alerta("El número debe tener 8 dígitos","error");
 return;
 }
 
-callback(dir);
 overlay.remove();
 
-};
+callback({
+direccion:direccionTemp,
+telefono:telefonoTemp
+});
 
-document.getElementById("cancelDir").onclick=()=>{
-overlay.remove();
 };
 
 }
 
+}
 /* ================= RENDER ================= */
 function render(){
 
@@ -705,30 +789,42 @@ alerta("Carrito vaciado ✔","success");
 });
 
 }
-
 /* ================= DELIVERY ================= */
 function setDelivery(v,el){
 
-delivery=v;
+delivery = v;
 
 document.querySelectorAll(".option")
-.forEach(o=>o.classList.remove("active"));
+.forEach(o => o.classList.remove("active"));
 
 el.classList.add("active");
 
-if(v>0){
-pedirDireccion((dir)=>{
-direccion=dir;
-alerta("Dirección Agregada Correctamente","success");
+if(v > 0){
+
+pedirDireccion((datos)=>{
+
+direccion = datos.direccion;
+telefono = datos.telefono;
+
+alerta("Dirección y teléfono agregados correctamente","success");
+
 calc();
+
 });
+
 }else{
-direccion="";
+
+direccion = "";
+telefono = "";
+
 calc();
+
 }
 
 alerta("Entrega actualizada ✔","info");
-}/* ================= ALERTA TRANSFERENCIA ================= */
+
+}
+/* ================= ALERTA TRANSFERENCIA ================= */
 function mostrarCuentaBampro(){
 
 let overlay=document.createElement("div");
@@ -828,7 +924,6 @@ document.getElementById("total").innerText="C$"+(subtotal+delivery).toLocaleStri
 function save(){
 localStorage.setItem("carrito",JSON.stringify(cart));
 }
-
 /* ================= WHATSAPP ================= */
 function sendWhatsApp(){
 
@@ -837,11 +932,15 @@ alerta("El carrito está vacío","error");
 return;
 }
 
-if(delivery>0 && !direccion){
+if(delivery>0 && (!direccion || !telefono)){
 
-pedirDireccion((dir)=>{
-direccion=dir;
+pedirDireccion((datos)=>{
+
+direccion = datos.direccion;
+telefono = datos.telefono;
+
 sendWhatsApp();
+
 });
 
 return;
@@ -862,7 +961,7 @@ mensaje+=`--------------------------------%0A`;
 mensaje+=`📅 Fecha: ${fecha}%0A`;
 mensaje+=`⏰ Hora : ${hora}%0A`;
 mensaje+=`--------------------------------%0A`;
-mensaje+=`🛒 PRODUCTOS%0A`;
+mensaje+=`🛒 *PRODUCTOS*%0A`;
 
 let subtotal=0;
 
@@ -877,6 +976,7 @@ let totalItem=item.precio*item.qty;
 mensaje+=`• ${item.nombre}${extrasText} x${item.qty} = C$${totalItem}%0A`;
 
 subtotal+=totalItem;
+
 });
 
 let total=subtotal+delivery;
@@ -887,6 +987,7 @@ mensaje+=`🚚 Entrega : C$${delivery}%0A`;
 
 if(delivery>0){
 mensaje+=`📍 Dirección: ${direccion}%0A`;
+mensaje+=`📞 Teléfono: ${telefono}%0A`;
 }
 
 mensaje+=`--------------------------------%0A`;
